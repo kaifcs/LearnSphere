@@ -1,0 +1,40 @@
+{
+  "name": "learnsphere-api",
+  "version": "1.0.0",
+  "description": "LearnSphere Backend API",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.10.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.2",
+    "express-rate-limit": "^7.5.1",
+    "fast-jwt": "^6.2.4",
+    "helmet": "^7.1.0",
+    "mongoose": "^9.8.0",
+    "nodemailer": "^6.10.1",
+    "otp-generator": "^4.0.1",
+    "razorpay": "^2.9.8",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "allowScripts": {
+    "bcrypt@6.0.0": true
+  }
+}

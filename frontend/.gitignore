@@ -1,0 +1,81 @@
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+# =========================
+# Dependencies
+# =========================
+node_modules/
+
+
+# =========================
+# Build Output
+# =========================
+dist/
+dist-ssr/
+build/
+coverage/
+
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+!.env.example
+
+
+# =========================
+# Temporary Files
+# =========================
+tmp/
+uploads/
+*.tmp
+
+
+# =========================
+# Cache
+# =========================
+.vite/
+.cache/
+.eslintcache
+
+
+# =========================
+# Bundle Reports
+# =========================
+bundle-report.html
+
+
+# =========================
+# Editor
+# =========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+
+# =========================
+# Visual Studio
+# =========================
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

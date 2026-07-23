@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="geometricPrecision">
+  <!-- Sphere emblem -->
+  <circle cx="256" cy="256" r="240" fill="#161D29"/>
+
+  <!-- Open book -->
+  <g fill="#FFD60A">
+    <polygon points="80,360 256,332 256,412 100,436"/>
+    <polygon points="432,360 256,332 256,412 412,436"/>
+  </g>
+  <line x1="256" y1="332" x2="256" y2="412" stroke="#161D29" stroke-width="10"/>
+
+  <!-- Mortarboard -->
+  <polygon points="256,152 400,208 256,264 112,208" fill="#FFD60A"/>
+  <polygon points="192,232 320,232 304,272 208,272" fill="#FFD60A"/>
+  <polygon points="192,232 320,232 256,258" fill="#161D29"/>
+
+  <!-- Growth arrow through center -->
+  <line x1="256" y1="332" x2="256" y2="104" stroke="#FFD60A" stroke-width="24" stroke-linecap="square"/>
+  <polygon points="256,64 220,120 292,120" fill="#FFD60A"/>
+
+  <!-- Cap button -->
+  <circle cx="256" cy="208" r="14" fill="#FFFFFF"/>
+</svg>
