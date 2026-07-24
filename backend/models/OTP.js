@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const mailSender = require('../utils/mailSender');
-const { otpTemplate } = require("../mail/templates/emailVerificationTemplate");
+const otpTemplate = require("../mail/templates/emailVerificationTemplate");
 
 const OTPSchema = new mongoose.Schema({
 
@@ -11,7 +11,8 @@ const OTPSchema = new mongoose.Schema({
 
     otp: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
     },
 
     createdAt: {

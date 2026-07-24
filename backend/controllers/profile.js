@@ -128,6 +128,11 @@ exports.deleteAccount = async (req, res) => {
             })
         }
 
+        // Delete all course progress of the student
+        await CourseProgress.deleteMany({
+            userId: userId,
+        });
+
         // first - delete profie (profileDetails)
         await Profile.findByIdAndDelete(userDetails.additionalDetails);
 

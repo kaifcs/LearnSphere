@@ -350,11 +350,18 @@ exports.getPurchaseHistory = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
+        const filteredHistory = purchaseHistory
+            .map((payment) => ({
+                ...payment,
+                courses: payment.courses.filter(Boolean),
+            }))
+            .filter((payment) => payment.courses.length > 0);
+
         return res.status(200).json({
             success: true,
-            data: purchaseHistory,
+            data: filteredHistory,
             message:
-                purchaseHistory.length
+                filteredHistory.length
                     ? "Purchase history fetched successfully"
                     : "No purchase history found",
         });

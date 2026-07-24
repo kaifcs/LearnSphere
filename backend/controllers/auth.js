@@ -55,17 +55,17 @@ exports.sendOTP = async (req, res) => {
 
         await OTP.create({
             email,
-            otp
+            otp: String(otp).trim(),
         });
 
-        // await mailSender(
-        //     email,
-        //     "OTP Verification Email",
-        //     otpTemplate(
-        //         otp,
-        //         name
-        //     )
-        // );
+        await mailSender(
+            email,
+            "OTP Verification Email",
+            otpTemplate(
+                otp,
+                name
+            )
+        );
 
         return res.status(200).json({
             success:true,
@@ -145,25 +145,25 @@ exports.signup = async(req,res)=>{
             });
         }
 
-        const recentOTP =
-            await OTP.findOne({
-                email
-            })
-            .sort({
-                createdAt:-1
-            });
+        // Find latest OTP
+        const recentOTP = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
-        if(!recentOTP){
+        if (!recentOTP) {
             return res.status(400).json({
-                success:false,
-                message:"OTP expired or not found"
+                success: false,
+                message: "OTP not found or expired",
             });
         }
 
-        if(recentOTP.otp !== otp){
+        // Normalize both OTPs
+        const enteredOTP = String(otp).trim();
+        const savedOTP = String(recentOTP.otp).trim();
+
+        // Compare OTP
+        if (enteredOTP !== savedOTP) {
             return res.status(400).json({
-                success:false,
-                message:"Invalid OTP"
+                success: false,
+                message: "Invalid OTP",
             });
         }
 
@@ -216,16 +216,12 @@ exports.signup = async(req,res)=>{
             }
         });
     }
-    catch(error){
-        console.error(
-            "Signup Error:",
-            error
-        );
+    catch (error) {
+        console.error("SIGNUP API ERROR:", error);
 
         return res.status(500).json({
-            success:false,
-            message:"Signup failed",
-            error:error.message
+            success: false,
+            message: error.message || "Signup failed",
         });
     }
 };

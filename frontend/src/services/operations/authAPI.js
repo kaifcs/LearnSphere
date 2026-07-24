@@ -70,7 +70,7 @@ export function signUp(accountType, firstName, lastName, email, password, confir
       navigate("/login");
     } catch (error) {
       console.error("SIGNUP API ERROR --> ", error);
-      toast.error("Invalid OTP");
+      toast.error(error?.response?.data?.message || "Signup failed");
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
