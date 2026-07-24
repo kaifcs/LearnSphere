@@ -1,40 +1,60 @@
-const nodemailer = require("nodemailer");
-
-const mailPort = Number(process.env.MAIL_PORT) || 2525;
-
-const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: mailPort,
-    secure: mailPort === 465,
-
-    auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-    },
-
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-});
+const brevo = require("@getbrevo/brevo");
 
 
 const mailSender = async (email, title, body) => {
     try {
 
-        const info = await transporter.sendMail({
-            from: `"LearnSphere" <${process.env.MAIL_USER}>`,
-            to: email,
-            subject: title,
-            html: body,
-        });
+        const apiInstance = new brevo.TransactionalEmailsApi();
 
-        return info;
+        apiInstance.setApiKey(
+            brevo.TransactionalEmailsApiApiKeys.apiKey,
+            process.env.BREVO_API_KEY
+        );
+
+
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+        sendSmtpEmail.sender = {
+            email: process.env.MAIL_USER,
+            name: "LearnSphere",
+        };
+
+
+        sendSmtpEmail.to = [
+            {
+                email: email,
+            },
+        ];
+
+
+        sendSmtpEmail.subject = title;
+
+        sendSmtpEmail.htmlContent = body;
+
+
+        const response = await apiInstance.sendTransacEmail(
+            sendSmtpEmail
+        );
+
+
+        console.log(
+            "Email sent successfully to:",
+            email
+        );
+
+
+        return response;
+
 
     } catch (error) {
 
         console.error(
-            `Email sending failed for ${email}:`,
-            error.message
+            "Email sending failed:",
+            email
+        );
+
+        console.error(
+            error?.response?.body || error.message
         );
 
         throw error;
