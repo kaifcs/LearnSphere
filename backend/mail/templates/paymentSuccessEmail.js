@@ -115,7 +115,7 @@ exports.paymentSuccessEmail = (
             <a href="https://learnsphere.vercel.app">
                 <img
                     class="logo"
-                    src="https://i.ibb.co/7Xyj3PC/logo.png"
+                    src="https://learn-sphere-lms.vercel.app/learnSphereLogo.png"
                     alt="LearnSphere Logo"
                 />
             </a>
