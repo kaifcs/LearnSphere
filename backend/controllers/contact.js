@@ -21,7 +21,7 @@ exports.contactUs = async (req, res) => {
 
 
         await mailSender(
-            process.env.MAIL_USER,
+            process.env.MAIL_FROM_EMAIL,
             "New Contact Request - LearnSphere",
             `
             <h2>New Contact Request - LearnSphere</h2>

@@ -1,29 +1,55 @@
-const nodemailer = require('nodemailer');
+const { BrevoClient } = require("@getbrevo/brevo");
+
 
 const mailSender = async (email, title, body) => {
     try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
-            auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS
-            }
+
+        const client = new BrevoClient({
+            apiKey: process.env.BREVO_API_KEY,
         });
 
-        const info = await transporter.sendMail({
-            from: `LearnSphere <${process.env.MAIL_USER}>`,            
-            to: email,
+        const response = await client.transactionalEmails.sendTransacEmail({
+
+            sender: {
+                email: process.env.MAIL_FROM_EMAIL,
+                name: process.env.MAIL_FROM_NAME,
+            },
+
+            to: [
+                {
+                    email: email,
+                },
+            ],
+
             subject: title,
-            html: body
+
+            htmlContent: body,
         });
 
 
-        return info;
-    }
-    catch (error) {
-        console.error('Error while sending mail (mailSender) - ', email);
+        console.log(
+            "Email sent successfully to:",
+            email
+        );
+
+
+        return response;
+
+
+    } catch (error) {
+
+        console.error(
+            "Email sending failed:",
+            email
+        );
+
+        console.error(
+            error?.response?.body || error.message
+        );
+
         throw error;
     }
-}
+};
+
 
 module.exports = mailSender;

@@ -18,38 +18,78 @@ const {
 export function sendOtp(email, navigate) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...");
+    const toastId = toast.loading("Sending OTP...");
     dispatch(setLoading(true));
 
     try {
-      const response = await apiConnector("POST", SENDOTP_API, {
-        email,
-        checkUserPresent: true,
-      })
-      // console.log("SENDOTP API RESPONSE ---> ", response)
+
+      const response = await apiConnector(
+        "POST",
+        SENDOTP_API,
+        {
+          email,
+          checkUserPresent: true,
+        }
+      );
+
 
       if (!response.data.success) {
         throw new Error(response.data.message);
       }
 
-      navigate("/verify-email");
+
       toast.success("OTP Sent Successfully");
+
+      navigate("/verify-email");
+
+
+      return true;   // IMPORTANT
+
+
     } catch (error) {
-      console.error("SENDOTP API ERROR --> ", error);
-      toast.error(error?.response?.data?.message || "Could not send OTP");
+
+      console.error(
+        "SENDOTP API ERROR --> ",
+        error
+      );
+
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Could not send OTP"
+      );
+
+
+      return false;  // IMPORTANT
+
+
+    } finally {
+
+      dispatch(setLoading(false));
+      toast.dismiss(toastId);
+
     }
-    dispatch(setLoading(false));
-    toast.dismiss(toastId);
-  }
+  };
 }
 
 // ================ sign Up ================
-export function signUp(accountType, firstName, lastName, email, password, confirmPassword, otp, navigate) {
+export function signUp(
+  accountType,
+  firstName,
+  lastName,
+  email,
+  password,
+  confirmPassword,
+  otp,
+  navigate
+) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...");
+    const toastId = toast.loading("Creating Account...");
     dispatch(setLoading(true));
+
     try {
+
       const response = await apiConnector("POST", SIGNUP_API, {
         accountType,
         firstName,
@@ -58,22 +98,91 @@ export function signUp(accountType, firstName, lastName, email, password, confir
         password,
         confirmPassword,
         otp,
-      })
+      });
 
 
       if (!response.data.success) {
-        toast.error(response.data.message);
         throw new Error(response.data.message);
       }
 
+
       toast.success("Signup Successful");
-      navigate("/login");
+
+
+      // ================= AUTO LOGIN =================
+
+      const loginResponse = await apiConnector(
+        "POST",
+        LOGIN_API,
+        {
+          email,
+          password,
+        }
+      );
+
+
+      if (!loginResponse.data.success) {
+        throw new Error("Auto login failed");
+      }
+
+
+      // Store token
+      dispatch(setToken(loginResponse.data.token));
+
+
+      // Set user image
+      const userImage = loginResponse.data?.user?.image
+        ? loginResponse.data.user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${loginResponse.data.user.firstName} ${loginResponse.data.user.lastName}`;
+
+
+      // Store user
+      dispatch(
+        setUser({
+          ...loginResponse.data.user,
+          image: userImage,
+        })
+      );
+
+
+      // Save in local storage
+      localStorage.setItem(
+        "token",
+        JSON.stringify(loginResponse.data.token)
+      );
+
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...loginResponse.data.user,
+          image: userImage,
+        })
+      );
+
+
+      // Go dashboard
+      navigate("/dashboard/my-profile");
+
+
     } catch (error) {
-      console.error("SIGNUP API ERROR --> ", error);
-      toast.error("Invalid OTP");
+
+      console.error(
+        "SIGNUP API ERROR --> ",
+        error
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Signup failed"
+      );
+
+    } finally {
+
+      dispatch(setLoading(false));
+      toast.dismiss(toastId);
+
     }
-    dispatch(setLoading(false))
-    toast.dismiss(toastId)
   }
 }
 
