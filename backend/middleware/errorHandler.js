@@ -1,3 +1,7 @@
+// Express identifies error-handling middleware by its arity (exactly 4
+// params) — removing the unused `next` would make Express treat this as
+// regular middleware instead of an error handler.
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
 // import CourseCard from "../components/Catalog/CourseCard"
@@ -24,7 +24,7 @@ function Catalog() {
 
     // Fetch All Categories
     useEffect(() => {
-        ; (async () => {
+        (async () => {
             try {
                 const res = await fetchCourseCategories();
                 const category_id = res.filter(
@@ -40,7 +40,7 @@ function Catalog() {
 
     useEffect(() => {
         if (categoryId) {
-            ; (async () => {
+            (async () => {
                 setLoading(true)
                 try {
                     const res = await getCatalogPageData(categoryId)

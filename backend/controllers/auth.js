@@ -29,6 +29,12 @@ exports.sendOTP = async (req, res) => {
         });
 
         if(userExists){
+            // Deliberately NOT made enumeration-resistant: doing so would
+            // require claiming "OTP sent successfully" without generating
+            // or sending anything, which is a misleading response. Closing
+            // this would need either that misleading claim or an actual
+            // send to an already-registered email (an OTP flow redesign) —
+            // both are out of scope. See task output for full reasoning.
             return res.status(409).json({
                 success:false,
                 message:"User already registered"
@@ -164,9 +170,12 @@ exports.signup = async(req,res)=>{
             });
 
         if(existingUser){
-            return res.status(409).json({
-                success:false,
-                message:"User already exists"
+            // An already-registered email never receives a real OTP (see
+            // sendOTP), so this responds exactly like "no OTP found for
+            // this email" below — the two cases stay indistinguishable.
+            return res.status(400).json({
+                success: false,
+                message: "OTP not found or expired",
             });
         }
 
@@ -276,9 +285,11 @@ exports.login = async(req,res)=>{
             .populate("additionalDetails");
 
         if(!user){
-            return res.status(404).json({
+            // Same status/message as a wrong password below, so a failed
+            // login can't be used to tell whether an email is registered.
+            return res.status(401).json({
                 success:false,
-                message:"User not found"
+                message:"Invalid email or password"
             });
         }
 
@@ -298,7 +309,7 @@ exports.login = async(req,res)=>{
         if(!passwordMatch){
             return res.status(401).json({
                 success:false,
-                message:"Invalid password"
+                message:"Invalid email or password"
             });
         }
 

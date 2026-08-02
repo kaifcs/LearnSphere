@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from "react"
+import { Suspense, lazy, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { FiUploadCloud } from "react-icons/fi"
 import Loading from "../../../common/Loading";

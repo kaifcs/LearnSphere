@@ -1,4 +1,3 @@
-import React from "react"
 import copy from "copy-to-clipboard"
 import { toast } from "react-hot-toast"
 import { useDispatch, useSelector } from "react-redux"
@@ -21,7 +20,6 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
   const {
     thumbnail: ThumbnailImage,
     price: CurrentPrice,
-    _id: courseId,
   } = course
 
   const handleShare = () => {

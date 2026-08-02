@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from "react"
+import { Suspense, lazy, useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
     useLocation,
@@ -35,7 +35,7 @@ const VideoDetails = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    ; (async () => {
+    (async () => {
       if (!courseSectionData.length) return
       if (!courseId && !sectionId && !subSectionId) {
         navigate(`/dashboard/enrolled-courses`)

@@ -13,9 +13,11 @@ exports.resetPasswordToken = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Your Email is not registered with us'
+            // Same shape/status as a genuine send below — this endpoint
+            // must not reveal whether a given email is registered.
+            return res.status(200).json({
+                success: true,
+                message: 'If an account exists for this email, a password reset email has been sent.'
             });
         }
 
@@ -26,7 +28,7 @@ exports.resetPasswordToken = async (req, res) => {
         const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
         // update user by adding token & token expire date
-        const updatedUser = await User.findOneAndUpdate(
+        await User.findOneAndUpdate(
             { email: email },
             { token: hashedToken, resetPasswordTokenExpires: Date.now() + 5 * 60 * 1000 },
             { new: true }); // by marking true, it will return updated user
@@ -41,7 +43,7 @@ exports.resetPasswordToken = async (req, res) => {
         // return succes response
         res.status(200).json({
             success: true,
-            message: 'Email sent successfully , Please check your mail box and change password'
+            message: 'If an account exists for this email, a password reset email has been sent.'
         })
     }
 

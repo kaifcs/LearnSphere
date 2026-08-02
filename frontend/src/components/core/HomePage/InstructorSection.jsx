@@ -1,4 +1,3 @@
-import React from 'react'
 import Instructor from '../../../assets/Images/teacher3.png'
 import HighlightText from './HighlightText'
 import CTAButton from "../HomePage/Button"

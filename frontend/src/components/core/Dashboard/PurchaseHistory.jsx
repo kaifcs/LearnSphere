@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
 
 import { getPurchaseHistory } from "../../../services/operations/studentFeaturesAPI"
 import Img from './../../common/Img';
@@ -8,7 +7,6 @@ import { formattedDate } from "../../../utils/dateFormatter"
 
 export default function PurchaseHistory() {
   const { token } = useSelector((state) => state.auth)
-  const navigate = useNavigate()
 
   const [purchaseHistory, setPurchaseHistory] = useState(null)
 

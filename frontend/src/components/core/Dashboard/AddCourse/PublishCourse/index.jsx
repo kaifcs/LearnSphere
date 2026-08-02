@@ -58,8 +58,7 @@ export default function PublishCourse() {
     setLoading(false)
   }
 
-  const onSubmit = (data) => {
-    // console.log(data)
+  const onSubmit = () => {
     handleCoursePublish()
   }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { BiInfoCircle } from "react-icons/bi"
 import { HiOutlineGlobeAlt } from "react-icons/hi"
 // import { ReactMarkdown } from "react-markdown/lib/react-markdown"
@@ -277,7 +277,7 @@ function CourseDetails() {
           <div className="my-8 border border-richblack-600 p-8">
             <p className="text-3xl font-semibold">What you'll learn</p>
             <div className="mt-3">
-              {whatYouWillLearn?.split('\n').map((line, index) => (
+              {whatYouWillLearn?.split('\n')?.map((line, index) => (
                 <div key={index} className="flex items-center mb-2">
                   <p className="font-bold">{index + 1}.</p>
                   <p className="ml-2">{line}</p>

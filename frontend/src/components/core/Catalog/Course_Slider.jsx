@@ -1,4 +1,3 @@
-import React from "react";
 
 // Import Swiper styles
 import "swiper/css";

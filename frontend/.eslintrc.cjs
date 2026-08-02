@@ -17,4 +17,12 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+  overrides: [
+    {
+      // vite.config.js runs under Node (via Vite's CLI), not the browser —
+      // it needs the Node global `process`, unlike the rest of this app.
+      files: ['vite.config.js'],
+      env: { node: true },
+    },
+  ],
 }

@@ -19,7 +19,7 @@ exports.createCategory = async (req, res) => {
             });
         }
 
-        const categoryDetails = await Category.create({
+        await Category.create({
             name: name, description: description
         });
 

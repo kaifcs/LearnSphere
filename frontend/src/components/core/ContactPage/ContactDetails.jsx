@@ -1,4 +1,3 @@
-import React from "react"
 import { BiWorld } from "react-icons/bi"
 import { HiChatBubbleLeftRight } from "react-icons/hi2"
 import { IoCall } from "react-icons/io5"

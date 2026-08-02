@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { FaAward, FaShieldAlt, FaGraduationCap, FaLightbulb } from 'react-icons/fa';
 import timelineImage from '../../../assets/Images/TimelineImage.png'

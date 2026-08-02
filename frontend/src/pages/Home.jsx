@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { Link } from "react-router-dom"
 import HighlightText from '../components/core/HomePage/HighlightText'
 import CTAButton from "../components/core/HomePage/Button"

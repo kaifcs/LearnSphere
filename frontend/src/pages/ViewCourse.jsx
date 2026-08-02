@@ -33,7 +33,7 @@ export default function ViewCourse() {
 
   // get Full Details Of Course
   useEffect(() => {
-    ; (async () => {
+    (async () => {
       const courseData = await getFullDetailsOfCourse(courseId, token)
 
       if (!courseData?.courseDetails) {

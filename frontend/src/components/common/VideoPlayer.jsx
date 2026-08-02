@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import "video-react/dist/video-react.css";
 import { Player, BigPlayButton } from "video-react";
 
