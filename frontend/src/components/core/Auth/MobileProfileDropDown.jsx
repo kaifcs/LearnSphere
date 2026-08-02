@@ -35,9 +35,6 @@ export default function MobileProfileDropDown() {
         try {
             setLoading(true)
             const res = await fetchCourseCategories();
-            // const result = await apiConnector("GET", categories.CATEGORIES_API);
-
-            // console.log("Printing Sublinks result:", result);
             setSubLinks(res);
         }
         catch (error) {

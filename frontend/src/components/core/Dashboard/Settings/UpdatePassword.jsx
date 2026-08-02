@@ -53,8 +53,10 @@ export default function UpdatePassword() {
                 {...register("oldPassword", { required: true })}
               />
 
-              <span
+              <button
+                type="button"
                 onClick={() => setShowOldPassword((prev) => !prev)}
+                aria-label={showOldPassword ? "Hide password" : "Show password"}
                 className="absolute right-3 top-[38px] z-[10] cursor-pointer"
               >
                 {showOldPassword ? (
@@ -62,7 +64,7 @@ export default function UpdatePassword() {
                 ) : (
                   <AiOutlineEye fontSize={24} fill="#AFB2BF" />
                 )}
-              </span>
+              </button>
 
               {errors.oldPassword && (
                 <span className="-mt-1 text-[12px] text-yellow-100">
@@ -86,8 +88,10 @@ export default function UpdatePassword() {
                 {...register("newPassword", { required: true })}
               />
 
-              <span
+              <button
+                type="button"
                 onClick={() => setShowNewPassword((prev) => !prev)}
+                aria-label={showNewPassword ? "Hide password" : "Show password"}
                 className="absolute right-3 top-[38px] z-[10] cursor-pointer"
               >
                 {showNewPassword ? (
@@ -95,7 +99,7 @@ export default function UpdatePassword() {
                 ) : (
                   <AiOutlineEye fontSize={24} fill="#AFB2BF" />
                 )}
-              </span>
+              </button>
               {errors.newPassword && (
                 <span className="-mt-1 text-[12px] text-yellow-100">
                   Please enter your New Password.

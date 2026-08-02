@@ -5,6 +5,7 @@ const {
     uploadImageToCloudinary,
     deleteResourceFromCloudinary
 } = require("../utils/imageUploader");
+const { isCourseOwner, findCourseBySectionId } = require("../utils/courseOwnership");
 
 // ================ create SubSection ================
 exports.createSubSection = async (req, res) => {
@@ -22,6 +23,22 @@ exports.createSubSection = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Video file is required",
+            });
+        }
+
+        const course = await findCourseBySectionId(sectionId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Section not found",
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course",
             });
         }
 
@@ -84,6 +101,22 @@ exports.updateSubSection = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Section ID and SubSection ID are required",
+            });
+        }
+
+        const course = await findCourseBySectionId(sectionId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Section not found",
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course",
             });
         }
 
@@ -172,6 +205,22 @@ exports.deleteSubSection = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "SubSection ID and Section ID are required",
+            });
+        }
+
+        const course = await findCourseBySectionId(sectionId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Section not found",
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course",
             });
         }
 

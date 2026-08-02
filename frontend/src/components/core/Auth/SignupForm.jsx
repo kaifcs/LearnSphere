@@ -216,8 +216,10 @@ function SignupForm() {
                     : "border-pink-300"
               }`}
             />
-            <span
+            <button
+              type="button"
               onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute right-3 top-[38px] z-[10] cursor-pointer"
             >
               {showPassword ? (
@@ -225,7 +227,7 @@ function SignupForm() {
               ) : (
                 <AiOutlineEye fontSize={24} fill="#AFB2BF" />
               )}
-            </span>
+            </button>
             <p
               className={`mt-2 text-xs ${
                 password.length === 0
@@ -266,8 +268,10 @@ function SignupForm() {
                     : "border-pink-300"
               }`}
             />
-            <span
+            <button
+              type="button"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               className="absolute right-3 top-[38px] z-[10] cursor-pointer"
             >
               {showConfirmPassword ? (
@@ -275,7 +279,7 @@ function SignupForm() {
               ) : (
                 <AiOutlineEye fontSize={24} fill="#AFB2BF" />
               )}
-            </span>
+            </button>
             {confirmPassword.length > 0 && (
               <p
                 className={`mt-2 text-xs ${

@@ -81,7 +81,7 @@ const otpTemplate = (otp, name) => {
 			</h2>
 
 			<p>
-				This OTP is valid for the next <strong>3 minutes</strong>.
+				This OTP is valid for the next <strong>5 minutes</strong>.
 				If you did not request this verification, you can safely ignore
 				this email. Once your account is verified, you'll have full
 				access to LearnSphere and all its features.

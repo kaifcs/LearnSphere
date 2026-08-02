@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
@@ -93,7 +93,7 @@ The platform is built around **JWT authentication**, **OTP email verification**,
 - **Express Rate Limit** to protect authentication endpoints from brute-force attempts
 - **Compression** for gzip response compression
 - **Express File Upload** for handling media uploads with strict MIME-type validation
-- **Nodemailer** and **OTP Generator** for transactional emails and OTP verification
+- **Brevo API** and **OTP Generator** for transactional emails and OTP verification
 - **Razorpay** SDK for payment processing
 
 ### Database 🛢️
@@ -112,7 +112,7 @@ The platform is built around **JWT authentication**, **OTP email verification**,
 
 ## Key Features ✨
 
-- 🔐 **JWT Authentication** via HttpOnly cookies
+- 🔐 **JWT Authentication** via Bearer tokens
 - 📧 **OTP Email Verification**
 - 🎓 **Student & Instructor Dashboards**
 - 📚 **Course Management** with sections and lectures
@@ -195,7 +195,7 @@ A high-level diagram illustrating the LearnSphere architecture:
 
 ## Security Features 🔒
 
-- **JWT Authentication** using `fast-jwt`, stored in HttpOnly cookies to mitigate XSS attacks
+- **JWT Authentication** using `fast-jwt`, verified via a unified middleware
 - **Bcrypt** password hashing
 - **Helmet** security headers
 - **Express Rate Limiting** on authentication endpoints to prevent brute-force attempts

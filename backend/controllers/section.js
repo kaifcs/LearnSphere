@@ -5,6 +5,7 @@ const SubSection = require("../models/subSection");
 const {
     deleteResourceFromCloudinary
 } = require("../utils/imageUploader");
+const { isCourseOwner, findCourseBySectionId } = require("../utils/courseOwnership");
 
 // ================ create Section ================
 exports.createSection = async (req, res) => {
@@ -24,6 +25,13 @@ exports.createSection = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Course not found"
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course"
             });
         }
 
@@ -83,6 +91,25 @@ exports.updateSection = async (req, res) => {
             });
         }
 
+        // Ownership is resolved from the section's actual parent course,
+        // not the client-supplied courseId, so a caller can't pair their
+        // own courseId with someone else's sectionId to bypass this check.
+        const course = await findCourseBySectionId(sectionId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Section not found"
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course"
+            });
+        }
+
         const section = await Section.findById(sectionId);
 
         if (!section) {
@@ -96,7 +123,7 @@ exports.updateSection = async (req, res) => {
 
         await section.save();
 
-        const updatedCourseDetails = await Course.findById(courseId)
+        const updatedCourseDetails = await Course.findById(course._id)
             .populate({
                 path: "courseContent",
                 populate: {
@@ -132,6 +159,25 @@ exports.deleteSection = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Section ID and Course ID are required"
+            });
+        }
+
+        // Ownership is resolved from the section's actual parent course,
+        // not the client-supplied courseId, so a caller can't pair their
+        // own courseId with someone else's sectionId to bypass this check.
+        const course = await findCourseBySectionId(sectionId);
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Section not found"
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course"
             });
         }
 
@@ -172,7 +218,7 @@ exports.deleteSection = async (req, res) => {
 
         // Remove section from course
         const updatedCourse = await Course.findByIdAndUpdate(
-            courseId,
+            course._id,
             {
                 $pull: {
                     courseContent: sectionId
@@ -193,7 +239,7 @@ exports.deleteSection = async (req, res) => {
         // Delete section
         await Section.findByIdAndDelete(sectionId);
 
-        const updatedCourseDetails = await Course.findById(courseId)
+        const updatedCourseDetails = await Course.findById(course._id)
             .populate({
                 path: "courseContent",
                 populate: {

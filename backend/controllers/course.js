@@ -7,6 +7,7 @@ const CourseProgress = require('../models/courseProgress')
 
 const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
 const { convertSecondsToDuration } = require("../utils/secToDuration")
+const { isCourseOwner } = require("../utils/courseOwnership")
 
 
 
@@ -183,12 +184,15 @@ exports.getCourseDetails = async (req, res) => {
             });
         }
 
-        // if (courseDetails.status === "Draft") {
-        //   return res.status(403).json({
-        //     success: false,
-        //     message: `Accessing a draft course is forbidden`,
-        //   });
-        // }
+        // This endpoint has no auth middleware (public course-preview page),
+        // so there is no caller identity to exempt — draft courses are
+        // never visible here, regardless of who is asking.
+        if (courseDetails.status === "Draft") {
+            return res.status(403).json({
+                success: false,
+                message: `Accessing a draft course is forbidden`,
+            });
+        }
 
 
         let totalDurationInSeconds = 0
@@ -237,6 +241,28 @@ exports.getFullCourseDetails = async (req, res) => {
             });
         }
 
+        // Cheap, unpopulated lookup first: lets us check draft/ownership
+        // before fetching (and returning) full course content + video URLs.
+        const courseAccessCheck = await Course.findById(courseId).select("status instructor")
+
+        if (!courseAccessCheck) {
+            return res.status(404).json({
+                success: false,
+                message: `Could not find course with id: ${courseId}`,
+            })
+        }
+
+        // Drafts are only visible to the instructor who owns them — this is
+        // the endpoint the "Edit Course" flow uses to load an instructor's
+        // own (often still-Draft) course, so unlike getCourseDetails, it
+        // needs an owner exception rather than a blanket block.
+        if (courseAccessCheck.status === "Draft" && !isCourseOwner(courseAccessCheck, userId)) {
+            return res.status(403).json({
+                success: false,
+                message: "Accessing a draft course is forbidden",
+            });
+        }
+
         const courseDetails = await Course.findOne({
             _id: courseId,
         })
@@ -270,13 +296,6 @@ exports.getFullCourseDetails = async (req, res) => {
                 message: `Could not find course with id: ${courseId}`,
             })
         }
-
-        // if (courseDetails.status === "Draft") {
-        //   return res.status(403).json({
-        //     success: false,
-        //     message: `Accessing a draft course is forbidden`,
-        //   });
-        // }
 
         //   count total time duration of course
         let totalDurationInSeconds = 0
@@ -323,6 +342,13 @@ exports.editCourse = async (req, res) => {
 
         if (!course) {
             return res.status(404).json({ error: "Course not found" })
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to modify this course"
+            })
         }
 
         // If Thumbnail Image is found, update it
@@ -481,6 +507,13 @@ exports.deleteCourse = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Course not found"
+            });
+        }
+
+        if (!isCourseOwner(course, req.user.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this course"
             });
         }
 

@@ -4,6 +4,7 @@ import ReactStars from "react-rating-stars-component"
 import { useDispatch, useSelector } from "react-redux"
 
 import { removeFromCart } from "../../../../slices/cartSlice"
+import GetAvgRating from "../../../../utils/avgRating"
 import Img from './../../../common/Img';
 
 export default function RenderCartCourses() {
@@ -13,7 +14,10 @@ export default function RenderCartCourses() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {cart.map((course, indx) => (
+      {cart.map((course, indx) => {
+        const avgReviewCount = GetAvgRating(course?.ratingAndReviews)
+
+        return (
         <div
           key={course._id}
           className={`flex w-full flex-wrap items-start justify-between gap-6 ${indx !== cart.length - 1 && "border-b border-b-richblack-400 pb-6"
@@ -35,10 +39,10 @@ export default function RenderCartCourses() {
                 {course?.category?.name}
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-yellow-5">4.5</span>
+                <span className="text-yellow-5">{avgReviewCount || 0}</span>
                 <ReactStars
                   count={5}
-                  value={course?.ratingAndReviews?.length}
+                  value={avgReviewCount || 0}
                   size={20}
                   edit={false}
                   activeColor="#ffd700"
@@ -65,7 +69,8 @@ export default function RenderCartCourses() {
             </p>
           </div>
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

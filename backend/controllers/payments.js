@@ -97,6 +97,18 @@ exports.capturePayment = async (req, res) => {
 
         const paymentResponse = await instance.instance.orders.create(options);
 
+        // Record what this order was actually created for. This is the
+        // only source of truth verifyPayment will trust when deciding what
+        // to enroll, so a client can't pay for one order and then request
+        // enrollment into a different, more expensive set of courses.
+        await Payment.create({
+            userId,
+            courses: coursesId,
+            orderId: paymentResponse.id,
+            amount: totalAmount,
+            status: "Pending",
+        });
+
         // Return response
         return res.status(200).json({
             success: true,
@@ -122,28 +134,20 @@ exports.verifyPayment = async (req, res) => {
     const razorpay_order_id = req.body?.razorpay_order_id;
     const razorpay_payment_id = req.body?.razorpay_payment_id;
     const razorpay_signature = req.body?.razorpay_signature;
-    const courses = req.body?.coursesId;
     const userId = req.user.id;
 
+    // Note: the frontend still sends `coursesId` in this request body (kept
+    // for backward compatibility with the existing checkout call), but it
+    // is intentionally never read below — see the comment further down.
     if (
         !razorpay_order_id ||
         !razorpay_payment_id ||
         !razorpay_signature ||
-        !courses ||
-        !Array.isArray(courses) ||
-        courses.length === 0 ||
         !userId
     ) {
         return res.status(400).json({
             success: false,
             message: "Payment Failed, data not found",
-        });
-    }
-
-    if (!instance.instance) {
-        return res.status(500).json({
-            success: false,
-            message: "Razorpay is not configured",
         });
     }
 
@@ -154,46 +158,65 @@ exports.verifyPayment = async (req, res) => {
         .update(body.toString())
         .digest("hex");
 
-    if (expectedSignature === razorpay_signature) {
+    if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({
+            success: false,
+            message: "Payment verification failed",
+        });
+    }
 
-        // Enroll student
-        const enrollErrorResponse = await enrollStudents(courses, userId, res);
+    // The signature only proves a real payment happened for this order_id —
+    // it says nothing about which courses that order was for. The trusted
+    // answer to that question was recorded server-side in capturePayment,
+    // so we look it up instead of trusting req.body.coursesId. Matching on
+    // `userId` (from the verified JWT, not the request body) also ensures
+    // a caller can't verify/claim an order that belongs to someone else.
+    //
+    // The atomic Pending -> Success transition (only succeeds if the record
+    // is still Pending) doubles as replay protection: a second verification
+    // attempt for the same order finds no matching Pending record and never
+    // re-runs enrollment.
+    const paymentRecord = await Payment.findOneAndUpdate(
+        { orderId: razorpay_order_id, userId, status: "Pending" },
+        { paymentId: razorpay_payment_id, status: "Success" },
+        { new: false } // return the pre-update doc so we still have its `courses`
+    );
 
-        if (!enrollErrorResponse) {
-            try {
-                // Check if payment already exists
-                const existingPayment = await Payment.findOne({ paymentId: razorpay_payment_id });
-                
-                if (!existingPayment) {
-                    // Fetch order from Razorpay to get the exact amount
-                    const order = await instance.instance.orders.fetch(razorpay_order_id);
-                    
-                    await Payment.create({
-                        userId: userId,
-                        courses: courses,
-                        orderId: razorpay_order_id,
-                        paymentId: razorpay_payment_id,
-                        amount: order.amount / 100,
-                        status: "Success"
-                    });
-                }
-            } catch (error) {
-                console.error("Error creating payment history:", error);
-            }
+    if (!paymentRecord) {
+        const existing = await Payment.findOne({ orderId: razorpay_order_id, userId });
 
-            // Return response
+        if (existing?.status === "Success") {
+            // Already verified by an earlier (possibly replayed) request —
+            // respond the same way without re-running enrollment.
             return res.status(200).json({
                 success: true,
                 message: "Payment Verified",
             });
         }
-        
-        return; // enrollErrorResponse already sent response
+
+        return res.status(404).json({
+            success: false,
+            message: "No matching pending order found for this payment",
+        });
     }
 
-    return res.status(400).json({
-        success: false,
-        message: "Payment verification failed",
+    // Enroll student using the server-recorded course list, never req.body
+    const enrollErrorResponse = await enrollStudents(paymentRecord.courses, userId, res);
+
+    if (enrollErrorResponse) {
+        // Enrollment failed after the record was marked Success — revert so
+        // the order isn't stuck "paid" without the student being enrolled.
+        await Payment.updateOne(
+            { _id: paymentRecord._id },
+            { status: "Pending", $unset: { paymentId: "" } }
+        );
+
+        return; // enrollErrorResponse already sent a response
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Payment Verified",
     });
 };
 
@@ -345,7 +368,10 @@ exports.getPurchaseHistory = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const purchaseHistory = await Payment.find({ userId: userId })
+        // Orders now start "Pending" at capturePayment and only become
+        // "Success" once verified — exclude anything else so abandoned or
+        // never-completed checkouts don't show up as purchase history.
+        const purchaseHistory = await Payment.find({ userId: userId, status: "Success" })
             .populate("courses", "courseName thumbnail price")
             .sort({ createdAt: -1 })
             .lean();

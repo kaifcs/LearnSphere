@@ -79,6 +79,7 @@ const Home = () => {
             <div className="w-full h-[450px] md:h-[650px] absolute top-0 left-0 opacity-[0.3] overflow-hidden object-cover ">
                 <img src={backgroundImg} alt="Background"
                     loading="eager"
+                    fetchPriority="high"
                     decoding="async"
                     className="w-full h-full object-cover"
                 />

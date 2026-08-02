@@ -19,13 +19,16 @@ exports.resetPasswordToken = async (req, res) => {
             });
         }
 
-        // generate token
+        // generate token — the raw value goes in the email link; only its
+        // hash is ever stored, so a database read alone can't produce a
+        // working reset link
         const token = crypto.randomBytes(20).toString("hex");
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
         // update user by adding token & token expire date
         const updatedUser = await User.findOneAndUpdate(
             { email: email },
-            { token: token, resetPasswordTokenExpires: Date.now() + 5 * 60 * 1000 },
+            { token: hashedToken, resetPasswordTokenExpires: Date.now() + 5 * 60 * 1000 },
             { new: true }); // by marking true, it will return updated user
 
 
@@ -80,36 +83,39 @@ exports.resetPassword = async (req, res) => {
             });
         }
 
+        // The stored value is a hash of the token, never the raw token
+        // itself — hash the incoming token the same way and look it up by
+        // hash, so plaintext tokens are never compared or stored.
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-        // find user by token from DB
-        const userDetails = await User.findOne({ token: token });
+        // find user by hashed token from DB
+        const userDetails = await User.findOne({ token: hashedToken });
 
-        // check ==> is this needed or not ==> for security  
-        if (token !== userDetails.token) {
-            return res.status(401).json({
+        // No user matched this hash: token is invalid, forged, or was
+        // already used and cleared by a previous successful reset.
+        if (!userDetails) {
+            return res.status(400).json({
                 success: false,
-                message: 'Password Reset token is not matched'
+                message: 'This password reset link is invalid or has already been used'
             });
         }
-
-        // console.log('userDetails.resetPasswordExpires = ', userDetails.resetPasswordExpires);
 
         // check token is expire or not
         if (!(userDetails.resetPasswordTokenExpires > Date.now())) {
-            return res.status(401).json({
+            return res.status(400).json({
                 success: false,
-                message: 'Token is expired, please regenerate token'
+                message: 'This password reset link has expired, please request a new one'
             });
         }
-
 
         // hash new passoword
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // update user with New Password
+        // update user with new password, and clear the reset token so this
+        // link cannot be used again
         await User.findOneAndUpdate(
-            { token },
-            { password: hashedPassword },
+            { token: hashedToken },
+            { password: hashedPassword, token: null, resetPasswordTokenExpires: null },
             { new: true });
 
         res.status(200).json({
@@ -124,7 +130,7 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({
             success: false,
             error: error.message,
-            message: 'Error while reseting password12'
+            message: 'Error while reseting password'
         });
     }
 }

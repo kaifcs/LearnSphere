@@ -34,7 +34,7 @@ exports.auth = (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 error: error.message,
-                messgae: 'Error while decoding token'
+                message: 'Error while decoding token'
             })
         }
         // go to next middleware
@@ -45,7 +45,7 @@ exports.auth = (req, res, next) => {
         console.error(error);
         return res.status(500).json({
             success: false,
-            messgae: 'Error while token validating'
+            message: 'Error while token validating'
         })
     }
 }
@@ -56,7 +56,7 @@ exports.isStudent = (req, res, next) => {
         if (req.user?.accountType != 'Student') {
             return res.status(401).json({
                 success: false,
-                messgae: 'This Page is protected only for student'
+                message: 'This Page is protected only for student'
             })
         }
         // go to next middleware
@@ -68,7 +68,7 @@ exports.isStudent = (req, res, next) => {
         return res.status(500).json({
             success: false,
             error: error.message,
-            messgae: 'Error while cheching user validity with student accountType'
+            message: 'Error while cheching user validity with student accountType'
         })
     }
 }
@@ -79,7 +79,7 @@ exports.isInstructor = (req, res, next) => {
         if (req.user?.accountType != 'Instructor') {
             return res.status(401).json({
                 success: false,
-                messgae: 'This Page is protected only for Instructor'
+                message: 'This Page is protected only for Instructor'
             })
         }
         // go to next middleware
@@ -91,7 +91,7 @@ exports.isInstructor = (req, res, next) => {
         return res.status(500).json({
             success: false,
             error: error.message,
-            messgae: 'Error while cheching user validity with Instructor accountType'
+            message: 'Error while cheching user validity with Instructor accountType'
         })
     }
 }
@@ -102,7 +102,7 @@ exports.isAdmin = (req, res, next) => {
         if (req.user.accountType != 'Admin') {
             return res.status(401).json({
                 success: false,
-                messgae: 'This Page is protected only for Admin'
+                message: 'This Page is protected only for Admin'
             })
         }
         // go to next middleware
@@ -114,7 +114,7 @@ exports.isAdmin = (req, res, next) => {
         return res.status(500).json({
             success: false,
             error: error.message,
-            messgae: 'Error while cheching user validity with Admin accountType'
+            message: 'Error while cheching user validity with Admin accountType'
         })
     }
 }
